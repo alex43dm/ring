@@ -32,6 +32,8 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+void notifyDefaultTask(uint32_t val);
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

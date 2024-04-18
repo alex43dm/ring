@@ -6,8 +6,8 @@ set output-radix 16
 
 file build/rng01.elf
 
-target extended-remote | openocd -f openocd.cfg -c "gdb_port pipe; log_output openocd.log"
-#target extended-remote 127.0.0.1:3333
+#target extended-remote | openocd -f openocd.cfg -c "gdb_port pipe; log_output openocd.log"
+target extended-remote 127.0.0.1:3333
 
 set remote hardware-breakpoint-limit 6
 set remote hardware-watchpoint-limit 4
@@ -27,7 +27,7 @@ monitor arm semihosting_fileio enable
 
 load
 
-#break HAL_RTC_Init
+break USB_CDC_RxHandler
 #break HAL_RTC_WaitForSynchro
 #break ErrorHandler
 #break assert_param

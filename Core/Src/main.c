@@ -21,6 +21,8 @@
 #include "cmsis_os.h"
 #include "usb_device.h"
 
+#include "usbd_cdc_if.h"
+#include "task.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -68,6 +70,10 @@ void StartDefaultTask(void *argument);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+int _write(int file, char *ptr, int len) {
+    CDC_Transmit_FS((uint8_t*) ptr, len); return len;
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -100,8 +106,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
-
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -135,7 +141,8 @@ int main(void)
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
 
-  HAL_UART_Transmit(&huart2, (uint8_t*)"Start\r\n", 8U, 100);
+   printf("Start\r\n");
+  //HAL_UART_Transmit(&huart2, (uint8_t*)"Start\r\n", 8U, 100);
 
   /* Start scheduler */
   osKernelStart();
@@ -263,7 +270,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -276,12 +282,12 @@ static void MX_GPIO_Init(void)
 void StartDefaultTask(void *argument)
 {
   /* init code for USB_DEVICE */
-  MX_USB_DEVICE_Init();
+  //MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+     osDelay(1000);
   }
   /* USER CODE END 5 */
 }
@@ -292,6 +298,7 @@ void StartDefaultTask(void *argument)
   */
 void Error_Handler(void)
 {
+     printf("%s\r\n", __func__);
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();

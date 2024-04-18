@@ -21,6 +21,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_if.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+
+#include "ring.h"
+
 /* USER CODE BEGIN INCLUDE */
 
 /* USER CODE END INCLUDE */
@@ -241,6 +246,29 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* USER CODE END 5 */
 }
 
+void USB_CDC_RxHandler(uint8_t* Buf, uint32_t Len)
+{
+    uint32_t hp = 0;
+    uint32_t val;
+
+    Buf[0] -= 0x30;
+    val = Buf[0] | Buf[0] << 8 | Buf[0] << 16 | Buf[0] << 24;
+
+    uint32_t save_int = taskENTER_CRITICAL_FROM_ISR();
+
+    memset(Buf, 0, Len);
+
+    ring_all_color_set(val);
+
+    taskEXIT_CRITICAL_FROM_ISR(save_int);
+
+    printf("Ok %ld\r\n", val);
+
+    //CDC_Transmit_FS((uint8_t*)"Ok\r\n",4);
+
+    portEND_SWITCHING_ISR(hp);
+}
+
 /**
   * @brief  Data received over USB OUT endpoint are sent over CDC interface
   *         through this function.
@@ -261,6 +289,9 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+
+  USB_CDC_RxHandler(Buf, *Len);
+
   return (USBD_OK);
   /* USER CODE END 6 */
 }

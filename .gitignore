@@ -1,1 +1,4 @@
 openocd.log
+.*.swp
+build
+cscope.*
