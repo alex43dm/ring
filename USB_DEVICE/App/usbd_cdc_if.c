@@ -246,25 +246,30 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* USER CODE END 5 */
 }
 
+int led_num = 0;
+
 void USB_CDC_RxHandler(uint8_t* Buf, uint32_t Len)
 {
     uint32_t hp = 0;
     uint32_t val;
 
-    Buf[0] -= 0x30;
-    val = Buf[0] | Buf[0] << 8 | Buf[0] << 16 | Buf[0] << 24;
+    val = strtol((char*)Buf, NULL, 16);
+
+    printf("%02d %08X\r\n", led_num, (unsigned)val);
 
     uint32_t save_int = taskENTER_CRITICAL_FROM_ISR();
 
     memset(Buf, 0, Len);
 
-    ring_all_color_set(val);
+    ring_color_set(led_num++, val);
+
+    if (led_num >= LED_LEN) {
+        led_num = 0;
+        ring_flash();
+    }
 
     taskEXIT_CRITICAL_FROM_ISR(save_int);
 
-    printf("Ok %ld\r\n", val);
-
-    //CDC_Transmit_FS((uint8_t*)"Ok\r\n",4);
 
     portEND_SWITCHING_ISR(hp);
 }

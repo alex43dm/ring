@@ -1,6 +1,5 @@
 #include "stm32f1xx_hal.h"
 #include "ring.h"
-//#include "rand.h"
 
 uint32_t __attribute__(( section(".data") )) LED[LED_LEN];
 
@@ -16,7 +15,7 @@ void ring_reset(void)
     DO_UP;
 }
 
-static void ring_flash(void)
+void ring_flash(void)
 {
     int i,j,n;
 
@@ -43,7 +42,16 @@ void ring_all_color_set(uint32_t c)
     ring_flash();
 }
 
+void ring_color_set(int n, uint32_t c)
+{
+    if (n < LED_LEN) {
+        LED[n] = c;
+    }
+}
+
+
 /*
+//#include "rand.h"
 void ring_all_color_set_random(void)
 {
     ring_all_color_set(ADC1_get_val());

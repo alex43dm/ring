@@ -13,9 +13,11 @@
 #define BLUE    0xFF0000
 #define GREEN   0x0000FF
 
+void ring_flash(void);
 void ring_all_color_set(uint32_t c);
 void ring_reset(void);
-void ring_all_color_set_random(void);
-void ring_all_white_set_random(void);
+void ring_color_set(int n, uint32_t c);
+//void ring_all_color_set_random(void);
+//void ring_all_white_set_random(void);
 
 #endif //__RING_H__
