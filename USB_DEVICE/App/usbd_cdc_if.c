@@ -255,7 +255,7 @@ void USB_CDC_RxHandler(uint8_t* Buf, uint32_t Len)
 
     val = strtol((char*)Buf, NULL, 16);
 
-    printf("%02d %08X\r\n", led_num, (unsigned)val);
+    printf("%02d %06X\r\n", led_num, (unsigned)val);
 
     uint32_t save_int = taskENTER_CRITICAL_FROM_ISR();
 
