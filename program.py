@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from serial import Serial
+from serial import Serial, serialutil
 from os.path import exists, basename
 from sys import argv
 from traceback import print_exc
@@ -67,10 +67,17 @@ def collor_set_all_random():
         LEDS[i] = color_random()
     led_write()
 
+def collor_set_random_move():
+    for i in reversed(range(12)):
+        LEDS[i] = LEDS[i-1]
+    LEDS[0] = color_random()
+    led_write()
+
 #main
 if __name__ == "__main__":
     collor_set_all(b'000000')
     while(True):
         #collor_set_all_random()
-        collor_set_all(color_random())
-        sleep(1)
+#        collor_set_all(color_random())
+        collor_set_random_move()
+        sleep(0.3)
