@@ -246,30 +246,104 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* USER CODE END 5 */
 }
 
-int led_num = 0;
+static uint8_t to_hex(char c)
+{
+    if (c > 0x29 && c < 0x40) {
+        return c - 0x30;
+    }
 
-void USB_CDC_RxHandler(uint8_t* Buf, uint32_t Len)
+    if ((c > 0x40 && c < 0x47) || (c > 0x60 && c < 0x67)) {
+        switch(c)   {
+            case 'A': case 'a': return 10;
+            case 'B': case 'b': return 11;
+            case 'C': case 'c': return 12;
+            case 'D': case 'd': return 13;
+            case 'E': case 'e': return 14;
+            case 'F': case 'f': return 15;
+        }
+    }
+
+    return 0;
+}
+
+static uint8_t to_byte(const uint8_t *b)
+{
+    return to_hex(*b) << 4 | to_hex(*(b+1));
+}
+
+void USB_CDC_RxHandler(const uint8_t* Buf, uint32_t Len)
 {
     uint32_t hp = 0;
     uint32_t val;
+    uint8_t cmd;
+    int led_num = 0;
 
-    val = strtol((char*)Buf, NULL, 16);
+    printf("%ld %s", Len, Buf);
 
-    printf("%02d %06X\r\n", led_num, (unsigned)val);
+    if (Len > 1) {
+        cmd = to_byte(Buf);
+
+        printf(" %02X", cmd);
+
+        switch(cmd) {
+        case 0x00:
+            if (Len == 10) {
+                led_num = to_byte(Buf+2);
+                val = (to_byte(Buf+4) << 16) | (to_byte(Buf+6) << 8) | to_byte(Buf+8);
+                ring_color_set(led_num, val);
+                printf(" %02X %06X", led_num, (unsigned)val);
+            }
+            break;
+        case 0x01:
+            ring_flash();
+            break;
+        case 0x02:
+            if (Len == 8) {
+                val = (to_byte(Buf+2) << 16) | (to_byte(Buf+4) << 8) | to_byte(Buf+6);
+                ring_all_color_set(val);
+                printf(" %06X", (unsigned)val);
+            }
+            break;
+        case 0x03: //trun off
+            ring_all_color_set(0);
+            break;
+        case 0x04: //set white
+            if (Len == 4) {
+                uint8_t v = to_byte(Buf+2);
+                val = (v << 16) | (v << 8) | v;
+                ring_all_color_set(val);
+            }
+        case 0x05: //set green
+            if (Len == 4) {
+                uint8_t v = to_byte(Buf+2);
+                val = v;
+                ring_all_color_set(val);
+            }
+            break;
+        case 0x06: //set red
+            if (Len == 4) {
+                uint8_t v = to_byte(Buf+2);
+                val = v << 8;
+                ring_all_color_set(val);
+            }
+            break;
+        case 0x07: //set blue
+            if (Len == 4) {
+                uint8_t v = to_byte(Buf+2);
+                val = v << 16;
+                ring_all_color_set(val);
+            }
+            break;
+        }
+    }
+
+    printf("\r\n");
 
     uint32_t save_int = taskENTER_CRITICAL_FROM_ISR();
 
-    memset(Buf, 0, Len);
-
-    ring_color_set(led_num++, val);
-
-    if (led_num >= LED_LEN) {
-        led_num = 0;
-        ring_flash();
-    }
+    memset((void*)Buf, 0, Len);
 
     taskEXIT_CRITICAL_FROM_ISR(save_int);
-
 
     portEND_SWITCHING_ISR(hp);
 }
