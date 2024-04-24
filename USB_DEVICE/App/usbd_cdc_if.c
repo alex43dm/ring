@@ -343,6 +343,9 @@ void USB_CDC_RxHandler(const uint8_t* Buf, uint32_t Len)
         case 0x0A: //print leds
             ring_print();
             break;
+        case 0x0B: //random
+            ring_all_color_set_random();
+            break;
         default:
             printf(" error ");
         }

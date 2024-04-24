@@ -36,6 +36,8 @@ void notifyDefaultTask(uint32_t val);
 
 /* USER CODE END Includes */
 
+uint32_t adc_random(void);
+
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 

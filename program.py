@@ -6,8 +6,6 @@ from sys import argv, _getframe
 from traceback import print_exc
 from random import getrandbits
 from time import sleep
-import usb.core
-import usb.backend.libusb1
 
 port = '/dev/ttyACM1' #argv.pop()
 
@@ -171,17 +169,27 @@ class Ring():
             print(ex)
             print_exc()
 
+    def led_random(self):
+        if DEBUG:
+            print(_getframe(  ).f_code.co_name)
+        try:
+            self.write('0B')
+        except Exception as ex:
+            print(ex)
+            print_exc()
+
     def __deinit__(self):
         self.ser.close()
 
 #main
 if __name__ == "__main__":
     p = Ring(port)
+    p.led_random()
 #    p.collor_set_random_move()
 #    p.led_white(0x02)
 #    p.chip_read()
 #    p.collor_set_all_random()
-    p.led_off()
-    p.chip_save()
+#    p.led_off()
+#    p.chip_save()
     p.led_print()
 

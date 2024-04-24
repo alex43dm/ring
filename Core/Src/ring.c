@@ -3,6 +3,7 @@
 #include "stm32f1xx_hal.h"
 #include "ring.h"
 #include "flash.h"
+#include "main.h"
 
 uint32_t __attribute__(( section(".data") )) LED[LED_LEN] = {0};
 
@@ -69,30 +70,19 @@ void save_led(void)
     if (r != 0) {
         printf("%s error flash write: %d\r\n", __func__, r);
     }
-
-//    ring_print();
 }
 
 void restore_led(void)
 {
     flash_read(LED, LED_LEN);
-
-//    ring_print();
 }
 
-
-/*
-//#include "rand.h"
 void ring_all_color_set_random(void)
 {
-    ring_all_color_set(ADC1_get_val());
-    //ring_all_color_set(rand());
+    for(int n = 0; n < LED_LEN; n++) {
+        while((LED[n] = adc_random()) == 0);
+    }
+
+    ring_flash();
 }
 
-void ring_all_white_set_random(void)
-{
-    uint8_t c = (uint8_t)ADC1_get_val();
-    uint32_t f = (c << 16) | (c << 8) | c;
-    ring_all_color_set(f);
-}
-*/
