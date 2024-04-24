@@ -2,3 +2,4 @@ openocd.log
 .*.swp
 build
 cscope.*
+*.orig

@@ -283,7 +283,7 @@ void USB_CDC_RxHandler(const uint8_t* Buf, uint32_t Len)
     if (Len > 1) {
         cmd = to_byte(Buf);
 
-        printf(" %02X", cmd);
+        printf(" cmd:%02X", cmd);
 
         switch(cmd) {
         case 0x00:
@@ -334,6 +334,17 @@ void USB_CDC_RxHandler(const uint8_t* Buf, uint32_t Len)
                 ring_all_color_set(val);
             }
             break;
+        case 0x08: //save
+            save_led();
+            break;
+        case 0x09: //read save
+            restore_led();
+            break;
+        case 0x0A: //print leds
+            ring_print();
+            break;
+        default:
+            printf(" error ");
         }
     }
 

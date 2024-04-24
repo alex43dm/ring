@@ -2,14 +2,16 @@
 
 from serial import Serial, serialutil
 from os.path import exists, basename
-from sys import argv
+from sys import argv, _getframe
 from traceback import print_exc
 from random import getrandbits
 from time import sleep
+import usb.core
+import usb.backend.libusb1
 
-port = '/dev/ttyACM3' #argv.pop()
+port = '/dev/ttyACM1' #argv.pop()
 
-DEBUG = False
+DEBUG = True
 
 #########################################################################
 class Ring():
@@ -48,11 +50,13 @@ class Ring():
             print_exc()
 
     def write(self, val):
+        if DEBUG:
+            print(_getframe(  ).f_code.co_name)
         try:
             self.ser.write(val.encode('ascii'))
             s = self.ser.readline()
             if DEBUG:
-                print("{0}".format(s.decode("utf-8").rstrip()))
+                print("{0} {1}".format(len(s),s.decode("utf-8").rstrip()))
         except serialutil.SerialException as ex:
             self.ser.close()
             print(ex)
@@ -67,6 +71,8 @@ class Ring():
         self.led_write()
 
     def led_write(self):
+        if DEBUG:
+            print(_getframe(  ).f_code.co_name)
         try:
             for i in range(12):
                 self.write('00' + '%0.2X' % i + self.LEDS[i])
@@ -117,11 +123,15 @@ class Ring():
         return g + r + b
 
     def collor_set_all_random(self):
+        if DEBUG:
+            print(_getframe(  ).f_code.co_name)
         for i in range(12):
             self.LEDS[i] = self.color_random()
         self.led_write()
 
     def collor_set_random_move(self):
+        if DEBUG:
+            print(_getframe(  ).f_code.co_name)
         try:
             self.collor_set_all_random()
             while True:
@@ -134,14 +144,44 @@ class Ring():
         except KeyboardInterrupt:
             pass
 
+    def chip_save(self):
+        if DEBUG:
+            print(_getframe(  ).f_code.co_name)
+        try:
+            self.write('08')
+        except Exception as ex:
+            print(ex)
+            print_exc()
+
+    def chip_read(self):
+        if DEBUG:
+            print(_getframe(  ).f_code.co_name)
+        try:
+            self.write('09')
+        except Exception as ex:
+            print(ex)
+            print_exc()
+
+    def led_print(self):
+        if DEBUG:
+            print(_getframe(  ).f_code.co_name)
+        try:
+            self.write('0A')
+        except Exception as ex:
+            print(ex)
+            print_exc()
+
     def __deinit__(self):
         self.ser.close()
 
 #main
 if __name__ == "__main__":
     p = Ring(port)
-    p.collor_set_random_move()
-    p.led_off()
-#    p.led_white(0x01)
-
+#    p.collor_set_random_move()
+#    p.led_off()
+#    p.led_white(0x02)
+#    p.collor_set_all_random()
+#    p.chip_save()
+#    p.chip_read()
+    p.led_print()
 

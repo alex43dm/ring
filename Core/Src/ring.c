@@ -1,7 +1,10 @@
+#include <stdio.h>
+
 #include "stm32f1xx_hal.h"
 #include "ring.h"
+#include "flash.h"
 
-uint32_t __attribute__(( section(".data") )) LED[LED_LEN];
+uint32_t __attribute__(( section(".data") )) LED[LED_LEN] = {0};
 
 #define DO_UP   (GPIOB->BSRR = (uint32_t)0x00000800)
 #define DO_DOWN (GPIOB->BSRR = (uint32_t)0x08000000)
@@ -35,6 +38,12 @@ void ring_flash(void)
     }
 }
 
+void ring_print(void)
+{
+    for(int n = 0; n < LED_LEN; n++)
+        printf(" %d:%06X", n, (unsigned)LED[n]);
+}
+
 void ring_all_color_set(uint32_t c)
 {
     for(int n = 0; n < LED_LEN; n++) LED[n] = c;
@@ -47,6 +56,26 @@ void ring_color_set(int n, uint32_t c)
     if (n < LED_LEN) {
         LED[n] = c;
     }
+}
+
+void save_led(void)
+{
+    HAL_StatusTypeDef r;
+
+    r = flash_write(LED, LED_LEN);
+
+    if (r != 0) {
+        printf("%s error flash write: %d\r\n", __func__, r);
+    }
+
+//    ring_print();
+}
+
+void restore_led(void)
+{
+    flash_read(LED, LED_LEN);
+
+//    ring_print();
 }
 
 
