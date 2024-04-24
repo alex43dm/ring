@@ -178,10 +178,10 @@ class Ring():
 if __name__ == "__main__":
     p = Ring(port)
 #    p.collor_set_random_move()
-#    p.led_off()
 #    p.led_white(0x02)
-#    p.collor_set_all_random()
-#    p.chip_save()
 #    p.chip_read()
+#    p.collor_set_all_random()
+    p.led_off()
+    p.chip_save()
     p.led_print()
 

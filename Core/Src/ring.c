@@ -8,6 +8,7 @@ uint32_t __attribute__(( section(".data") )) LED[LED_LEN] = {0};
 
 #define DO_UP   (GPIOB->BSRR = (uint32_t)0x00000800)
 #define DO_DOWN (GPIOB->BSRR = (uint32_t)0x08000000)
+#define PAUSE(p) for(int j = 0; j < (p); j++)__NOP();
 
 void ring_reset(void)
 {
@@ -20,19 +21,20 @@ void ring_reset(void)
 
 void ring_flash(void)
 {
-    int i,j,n;
+    int i,n;
 
     for(n = 0; n < LED_LEN; n++) {
         for(i = 0; i < 24; i++) {
             if (LED[n] & (1 << i)) {
                 DO_UP;
-                for(j = 0; j < 3; j++)__NOP();
+                PAUSE(3)
                 DO_DOWN;
+                __NOP();
             } else {
                 DO_UP;
-                for(j = 0; j < 1; j++)__NOP();
+                __NOP();
                 DO_DOWN;
-                for(j = 0; j < 2; j++)__NOP();
+                PAUSE(3)
             }
         }
     }
