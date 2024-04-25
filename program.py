@@ -178,18 +178,41 @@ class Ring():
             print(ex)
             print_exc()
 
+    def led_random_move(self):
+        if DEBUG:
+            print(_getframe(  ).f_code.co_name)
+        try:
+            self.write('0C')
+        except Exception as ex:
+            print(ex)
+            print_exc()
+
+    def led_random_move_auto(self, f):
+        if DEBUG:
+            print(_getframe(  ).f_code.co_name)
+        try:
+            if f:
+                self.write('0D')
+            else:
+                self.write('0E')
+        except Exception as ex:
+            print(ex)
+            print_exc()
+
     def __deinit__(self):
         self.ser.close()
 
 #main
 if __name__ == "__main__":
     p = Ring(port)
-    p.led_random()
+    p.led_random_move_auto(True)
+#    p.led_random()
+#    p.led_random_move()
 #    p.collor_set_random_move()
 #    p.led_white(0x02)
 #    p.chip_read()
 #    p.collor_set_all_random()
 #    p.led_off()
-#    p.chip_save()
+    p.chip_save()
     p.led_print()
 

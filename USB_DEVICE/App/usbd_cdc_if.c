@@ -346,6 +346,15 @@ void USB_CDC_RxHandler(const uint8_t* Buf, uint32_t Len)
         case 0x0B: //random
             ring_all_color_set_random();
             break;
+        case 0x0C: //random move
+            ring_all_color_set_random_move();
+            break;
+        case 0x0D: //random move set
+            set_randome_move(true);
+            break;
+        case 0x0E: //random move unset
+            set_randome_move(false);
+            break;
         default:
             printf(" error ");
         }

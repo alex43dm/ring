@@ -22,5 +22,6 @@ void ring_color_set(int n, uint32_t c);
 uint32_t ring_color_get(int n);
 void ring_print(void);
 void ring_all_color_set_random(void);
+void ring_all_color_set_random_move(void);
 
 #endif //__RING_H__

@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdbool.h>
 #include "stm32f1xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -37,6 +38,8 @@ void notifyDefaultTask(uint32_t val);
 /* USER CODE END Includes */
 
 uint32_t adc_random(void);
+void set_randome_move(bool f);
+bool get_randome_move(void);
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */

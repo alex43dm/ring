@@ -466,6 +466,18 @@ static void MX_GPIO_Init(void)
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
+static bool random_move_flag = false;
+
+void set_randome_move(bool f)
+{
+    random_move_flag = f;
+}
+
+bool get_randome_move(void)
+{
+    return random_move_flag;
+}
+
 void StartDefaultTask(void *argument)
 {
   /* init code for USB_DEVICE */
@@ -479,6 +491,9 @@ void StartDefaultTask(void *argument)
   for(;;)
   {
      osDelay(1000);
+     if(random_move_flag) {
+        ring_all_color_set_random_move();
+     }
   }
   /* USER CODE END 5 */
 }

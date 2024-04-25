@@ -49,7 +49,7 @@ void ring_print(void)
 
 void ring_all_color_set(uint32_t c)
 {
-    for(int n = 0; n < LED_LEN; n++) LED[n] = c;
+    for(int n = 0; n < LED_LEN; n++) LED[n] = c & 0xFFFFFF;
 
     ring_flash();
 }
@@ -57,7 +57,7 @@ void ring_all_color_set(uint32_t c)
 void ring_color_set(int n, uint32_t c)
 {
     if (n < LED_LEN) {
-        LED[n] = c;
+        LED[n] = c & 0xFFFFFF;
     }
 }
 
@@ -65,7 +65,14 @@ void save_led(void)
 {
     HAL_StatusTypeDef r;
 
-    r = flash_write(LED, LED_LEN);
+    r = flash_write(0, LED, LED_LEN);
+
+    if (r != 0) {
+        printf("%s error flash write: %d\r\n", __func__, r);
+    }
+
+    uint32_t f = get_randome_move();
+    r = flash_write(LED_LEN * 4, &f, 1);
 
     if (r != 0) {
         printf("%s error flash write: %d\r\n", __func__, r);
@@ -74,14 +81,29 @@ void save_led(void)
 
 void restore_led(void)
 {
-    flash_read(LED, LED_LEN);
+    flash_read(0, LED, LED_LEN);
+
+    uint32_t f = 0;
+    flash_read(LED_LEN * 4, &f, 1);
+    set_randome_move(f);
 }
 
 void ring_all_color_set_random(void)
 {
     for(int n = 0; n < LED_LEN; n++) {
-        while((LED[n] = adc_random()) == 0);
+        while((LED[n] = adc_random() & 0xFFFFFF) == 0);
     }
+
+    ring_flash();
+}
+
+void ring_all_color_set_random_move(void)
+{
+    for(int n = LED_LEN - 1; n != 0; n--) {
+        LED[n] = LED[n-1];
+    }
+
+    while((LED[0] = adc_random() & 0xFFFFFF) == 0);
 
     ring_flash();
 }
